@@ -153,6 +153,8 @@ export default defineComponent({
   .title {
     font-size: 20px;
     font-weight: 700;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #409eff;
   }
 
   .handler {

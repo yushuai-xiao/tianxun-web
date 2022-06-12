@@ -40,6 +40,7 @@ router.beforeEach((to) => {
   }
   // console.log(to)
   if (to.path === '/main') {
+    console.log(to.path, firstMenu, 'fisstM')
     return firstMenu.url
   }
 })

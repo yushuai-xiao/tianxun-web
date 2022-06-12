@@ -1,10 +1,10 @@
 <template>
   <div class="nav-header">
     <i class="fold-Menu" @click="handleFoldClick"
-      ><el-icon v-if="isFold" :size="30" color="#f9ca24">
+      ><el-icon v-if="isFold" :size="28" color="#f9ca24">
         <expand />
       </el-icon>
-      <el-icon v-else :size="30" color="#f9ca24">
+      <el-icon v-else :size="28" color="#f9ca24">
         <fold />
       </el-icon>
     </i>
@@ -77,10 +77,9 @@ export default defineComponent({
 .nav-header {
   display: flex;
   width: 100%;
-  // justify-content: center;
+  justify-content: center;
   align-content: center;
   .fold-menu {
-    // font-size: 30px;
     cursor: pointer;
   }
 

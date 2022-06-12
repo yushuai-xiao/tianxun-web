@@ -43,7 +43,8 @@ import {
   ElDescriptionsItem,
   ElTooltip,
   ElAlert,
-  ElTimePicker
+  ElTimePicker,
+  ElProgress
 } from 'element-plus/lib'
 import {
   House,
@@ -109,7 +110,8 @@ const components = [
   UserFilled,
   ElemeFilled,
   Comment,
-  List
+  List,
+  ElProgress
 ]
 
 export default function (app: App): void {

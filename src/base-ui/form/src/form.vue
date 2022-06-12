@@ -140,6 +140,6 @@ export default defineComponent({
 
 <style scoped lang="less">
 .xs-form {
-  padding-top: 22px;
+  // padding-top: 22px;
 }
 </style>

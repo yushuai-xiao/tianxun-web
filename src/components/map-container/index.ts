@@ -1,3 +1,3 @@
-import MapContainer from './src/index.vue'
-
-export default MapContainer
+import MainContainer from './src/index.vue'
+import MapSearch from './src/map-search.vue'
+export { MainContainer, MapSearch }

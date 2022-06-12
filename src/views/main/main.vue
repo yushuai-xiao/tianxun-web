@@ -94,7 +94,7 @@ export default defineComponent({
 }
 
 .el-header {
-  height: 60px !important;
+  height: 50px !important;
 }
 
 .el-aside {

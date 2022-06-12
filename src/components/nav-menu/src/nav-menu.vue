@@ -1,7 +1,7 @@
 <template>
   <div class="nav-menu">
     <div class="logo">
-      <img src="~@/assets/img/logo.svg" alt="logo" class="img" />
+      <img src="~@/assets/img/xqLogo.png" alt="logo" class="img" />
       <span v-if="!collapse" class="title">清源考勤管理系统</span>
     </div>
     <el-menu
@@ -13,7 +13,7 @@
       :collapse="collapse"
     >
       <!-- 根据登录用户返回的数据，动态加载菜单，从store中拿出数据 -->
-      <template v-for="item in userMenus" :key="item.id">
+      <template v-for="(item, index) in userMenus" :key="item.id">
         <!-- 二级菜单 -->
         <!-- <el-sub-menu :index="item.id + ''">
             <template #title>
@@ -25,11 +25,11 @@
               <span>{{ item.name }}</span>
             </template> -->
         <!-- <template v-for="subitem in item.children" :key="subitem.id"> -->
-        <el-menu-item :index="item.id + ''" @click="handleMenuItemClick(item)">
+        <el-menu-item :index="index" @click="handleMenuItemClick(item)">
+          <el-icon>
+            <component :is="item.icon" color="#f9ca24"></component>
+          </el-icon>
           <template #title>
-            <el-icon>
-              <component :is="item.icon" color="#f9ca24"></component>
-            </el-icon>
             <span>{{ item.name }}</span>
           </template>
         </el-menu-item>
@@ -98,15 +98,16 @@ export default defineComponent({
   background-color: #001529;
   .logo {
     display: flex;
-    height: 28px;
+    height: 30px;
     padding: 12px 10px 8px 5px;
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    // background-color: #2d3436;
+    background-color: #2d3436;
     .img {
       height: 100%;
       margin: 0 10px;
+      border-radius: 15px;
     }
 
     .title {

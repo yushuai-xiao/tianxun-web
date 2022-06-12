@@ -47,7 +47,7 @@
       <div class="b btn" @click="offWork">
         <p class="icon"></p>
         <SoldOut style="width: 20px; height: 20px; margin-right: 8px" />
-        <p class="btn-title">打卡上班</p>
+        <p class="btn-title">打卡下班</p>
       </div>
     </div>
     <div class="card-content">
@@ -243,6 +243,19 @@
                   format="HH:mm:ss"
                 />
               </el-form-item>
+              <el-form-item label="考勤位置">
+                <el-input
+                  v-model="settingTime.mapLocation"
+                  readonly
+                  style="width: 180px"
+                ></el-input>
+                <el-button
+                  type="primary"
+                  @click="dialogVisible = true"
+                  style="position: absolute; top: 0px; left: 200px"
+                  >地图搜索</el-button
+                >
+              </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="settingCtime">设置</el-button>
               </el-form-item>
@@ -253,6 +266,28 @@
       </el-tabs>
     </div>
   </div>
+  <el-dialog v-model="dialogVisible" title="地图搜索" width="60%">
+    <el-input
+      v-model="searchInput"
+      style="width: 300px"
+      placeholder="请输入位置"
+      :id="searchId"
+      clearable
+    ></el-input>
+    <!-- <el-button type="primary" @click="searchLoaction">搜索</el-button> -->
+    <MapSearch
+      :searchId="searchId"
+      :locationInfo="locationInfo"
+      @latInfo="latInfo"
+      class="map-search"
+    />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="confimInfo">确定</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script lang="ts">
@@ -266,7 +301,7 @@ import {
   updateWork
 } from '@/service/attendance/index'
 import { getPageListData } from '@/service/main/system/system'
-import MainContainer from '@/components/map-container'
+import { MainContainer, MapSearch } from '@/components/map-container'
 
 import { useStore } from 'vuex'
 import { ElMessage } from 'element-plus'
@@ -281,7 +316,8 @@ export default defineComponent({
   components: {
     Finished,
     SoldOut,
-    MainContainer
+    MainContainer,
+    MapSearch
   },
   setup() {
     // 获取用户的id信息
@@ -317,7 +353,6 @@ export default defineComponent({
           }
         })
       } else {
-        console.log('test')
         const workListResult = await requestWorkInfoById({ user_id: id })
         console.log(workListResult)
         tableData.value = workListResult.data
@@ -328,12 +363,17 @@ export default defineComponent({
         })
       }
     }
-
+    const locationData = ref({
+      lat: '',
+      lng: ''
+    })
     const getWorkConfigSetting = async () => {
       // 获取工作时间配置
       const workConfig = await getWorkConfig()
       startTime.value = workConfig.data[0].start
       endTime.value = workConfig.data[0].end
+      locationData.value.lat = workConfig.data[0].lat
+      locationData.value.lng = workConfig.data[0].lng
     }
     const departList = ref([
       {
@@ -445,16 +485,24 @@ export default defineComponent({
     // 上班时间
     const settingTime = ref({
       start: '',
-      end: ''
+      end: '',
+      mapLocation: '',
+      lat: 0,
+      lng: 0
     })
     // 设置上下班时间
     const settingCtime = () => {
-      if (settingTime.value.start === '' && settingTime.value.end === '') {
+      if (
+        settingTime.value.start === '' ||
+        settingTime.value.end === '' ||
+        settingTime.value.lat === 0 ||
+        settingTime.value.lng === 0
+      ) {
         ElMessage({
-          message: '时间设置不能为空',
+          message: '时间和地理设置不能为空',
           type: 'error'
         })
-        // return
+        return
       }
       const startDate = new Date(settingTime.value.start)
       const endDate = new Date(settingTime.value.end)
@@ -478,7 +526,10 @@ export default defineComponent({
           ':' +
           endDate.getMinutes() +
           ':' +
-          endDate.getSeconds()
+          endDate.getSeconds(),
+        mapLocation: settingTime.value.mapLocation,
+        lng: settingTime.value.lng,
+        lat: settingTime.value.lat
       }
       setWorkConfig(setting).then((res) => {
         if (res.code === 200) {
@@ -489,6 +540,7 @@ export default defineComponent({
         }
         //获取工作时间配置
         getWorkConfigSetting()
+        window.location.reload()
       })
     }
     const locInfo = ref({
@@ -520,8 +572,8 @@ export default defineComponent({
       const location = data.formattedAddress //具体街道位置信息
       console.log(location)
 
-      const locationZone = [117.29330062866211, 31.745131497253077] //设置的签到点
-      // const locationZone = [117.29330062866211, 35.745131497253077] //设置的签到点
+      // const locationZone = [117.29330062866211, 31.745131497253077] //设置的签到点
+      const locationZone = [locationData.value.lng, locationData.value.lat] //设置的签到点
 
       const AMap = data.AMap
       //计算当前位置与考勤点距离
@@ -585,9 +637,7 @@ export default defineComponent({
         })
         return
       }
-      console.log('上班打卡')
 
-      console.log(proxyDate.getDay())
       const workParam = {
         date: proxyTime,
         type: [1, 2, 3, 4, 5].includes(proxyDate.getDay()) ? '0' : '1',
@@ -603,7 +653,6 @@ export default defineComponent({
         remark: '0',
         user_id: id
       }
-      console.log(workParam.type)
       /*
       remark{
         0:正常，
@@ -683,6 +732,32 @@ export default defineComponent({
       }
       console.log('下班打卡')
     }
+    // 对话框内容
+    const dialogVisible = ref(false)
+    const locationInfo = ref('')
+    const searchInput = ref('')
+    const searchId = ref('searchId')
+    const searchLoaction = () => {
+      console.log('object')
+      locationInfo.value = searchInput.value
+    }
+    const latData = ref({
+      name: '',
+      location: {
+        lng: 0,
+        lat: 0
+      }
+    })
+    const latInfo = (info: any) => {
+      latData.value = info
+      console.log(info, 'info')
+    }
+    const confimInfo = () => {
+      dialogVisible.value = false
+      settingTime.value.mapLocation = latData.value.name
+      settingTime.value.lng = latData.value.location.lng
+      settingTime.value.lat = latData.value.location.lat
+    }
     return {
       // 部门列表
       departList,
@@ -716,7 +791,15 @@ export default defineComponent({
       addressInfo,
       localReload,
       onWork,
-      offWork
+      offWork,
+      // 对话框
+      dialogVisible,
+      locationInfo,
+      searchLoaction,
+      searchInput,
+      searchId,
+      latInfo,
+      confimInfo
     }
   }
 })
@@ -864,6 +947,12 @@ export default defineComponent({
         align-self: flex-start;
       }
     }
+  }
+  .map-search {
+    background-color: #000;
+    margin-top: 10px;
+    width: 800px;
+    height: 260px;
   }
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="page-search">
     <xs-form v-bind="searchFormConfig" v-model="formData">
       <template #header>
-        <h1 class="header">搜 索</h1>
+        <h1 class="header"><span>搜索内容</span></h1>
       </template>
       <template #footer>
         <div class="handle-btns">
@@ -91,7 +91,15 @@ export default defineComponent({
 
 <style scoped lang="less">
 .header {
-  color: rgb(90, 151, 207);
+  color: #333;
+  text-align: left;
+  padding-left: 15px;
+  padding-top: 10px;
+  span {
+    display: inline;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #409eff;
+  }
 }
 .handle-btns {
   text-align: right;

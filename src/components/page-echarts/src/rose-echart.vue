@@ -32,11 +32,11 @@ const options = computed(() => {
       {
         name: '类别数据',
         type: 'pie',
-        radius: [10, 100],
-        center: ['50%', '50%'],
+        radius: [90, 100],
+        // center: ['50%', '50%'],
         roseType: 'area',
         itemStyle: {
-          borderRadius: 8
+          borderRadius: 0
         },
         data: props.roseData
       }

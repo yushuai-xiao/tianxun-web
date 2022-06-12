@@ -6,7 +6,7 @@ import { IBreadcrumb } from '@/base-ui/breadcrumb'
 let firstMenu: any = null
 export function mapMenusToRoutes(userMenus: any[]): RouteRecordRaw[] {
   const routes: RouteRecordRaw[] = []
-
+  firstMenu = null
   // 1.先去加载默认所有的routes
   const allRoutes: RouteRecordRaw[] = []
   const routeFiles = require.context('../router/main', true, /\.ts/)
@@ -22,6 +22,7 @@ export function mapMenusToRoutes(userMenus: any[]): RouteRecordRaw[] {
   // type === 1 -> children -> type === 1
   // type === 2 -> url -> route
   const _recurseGetRoute = (menus: any[]) => {
+    console.log(menus, 'menus')
     for (const menu of menus) {
       if (menu.superId !== null && menu.children) {
         const route = allRoutes.find((route) => route.path === menu.url)
